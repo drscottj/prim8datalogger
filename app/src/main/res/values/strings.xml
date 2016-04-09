@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Prim8 Data Logger</string>
+    <string name="transfer_to_file">Transfer to File</string>
+</resources>
