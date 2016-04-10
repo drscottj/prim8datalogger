@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.app.Activity;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +58,7 @@ public class LogListViewAdapter extends BaseAdapter{
             convertView=inflater.inflate(R.layout.log_layout, null);
 
             txtFirst=(TextView) convertView.findViewById(R.id.textView1);
+            txtFirst.setTextSize(TypedValue.COMPLEX_UNIT_DIP, Constants.text_dip_size);
 //            txtSecond=(TextView) convertView.findViewById(R.id.textView2);
 //            txtThird=(TextView) convertView.findViewById(R.id.textView3);
 //            txtFourth=(TextView) convertView.findViewById(R.id.textView4);

@@ -12,4 +12,5 @@ public class Constants {
     public static final String TIME_KEY="TIMESTAMP";
     public static final String ARRAY_ITEM_PREFIX = "prim8logger";
     public static final String OUTPUT_FILE_NAME = "prim8logger";
+    public static final int text_dip_size=25;
 }

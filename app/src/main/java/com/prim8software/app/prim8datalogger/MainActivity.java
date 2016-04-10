@@ -17,8 +17,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -36,8 +38,10 @@ import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
 
+    ArrayList<String> labels = new ArrayList<String>();
     ArrayList<HashMap<String,String>> listViewItems=new ArrayList<HashMap<String,String>>();
-    LogListViewAdapter listViewAdapter;
+    //LogListViewAdapter listViewAdapter;
+    ArrayAdapter<String> listViewAdapter;
     LocationManager locationManager;
     String latitudeString, longitudeString, locationProvider;
 
@@ -48,16 +52,21 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         setContentView(R.layout.activity_main);
 
         //--LISTVIEW--
-        listViewAdapter=new LogListViewAdapter(this, listViewItems);
         ListView lv = (ListView) this.findViewById(R.id.listView);
+        //listViewAdapter=new LogListViewAdapter(this, listViewItems);
+        listViewAdapter = new ArrayAdapter<String>(  this,
+                android.R.layout.simple_list_item_1,
+                labels
+        );
         lv.setAdapter(listViewAdapter);
+
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id)
             {
-                HashMap<String,String> entry = (HashMap<String,String>)listViewAdapter.getItem(position);
+                HashMap<String,String> entry = listViewItems.get(position);
                 String ss = "Name:\n" + (String)entry.get(Constants.DATA_KEY) +
                         "\nTime:\n" + (String)entry.get(Constants.TIME_KEY) +
                         "\nLatitude:\n" + (String)entry.get(Constants.LAT_KEY) +
@@ -77,7 +86,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             //, findViewById(R.id.listView)));
             etUserInput.setFocusable(true);
             etUserInput.setFocusableInTouchMode(true);
+            etUserInput.setTextSize(TypedValue.COMPLEX_UNIT_DIP, Constants.text_dip_size);
         }
+
 
 
 
@@ -111,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         //--SAVE FILES--
         Button button = (Button) findViewById(R.id.button);
+        button.setTextSize(TypedValue.COMPLEX_UNIT_DIP, Constants.text_dip_size);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -121,28 +133,22 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     {
                         File file = new File(Environment.getExternalStoragePublicDirectory(
                                 Environment.DIRECTORY_DOCUMENTS), Constants.OUTPUT_FILE_NAME + String.valueOf(Common.CurrentTime()) + ".csv");
-                        if (!file.mkdirs()) {
-                            Toast.makeText(getBaseContext(), "Directory not created", Toast.LENGTH_SHORT).show();
-                            ok = false;
-                        }
-                        else
+                        if(file.createNewFile())
                         {
-                            if(file.createNewFile()) {
-                                if (file.canWrite() || file.setWritable(true)) {
-                                    FileWriter fw = new FileWriter(file);
-                                    BufferedWriter bw = new BufferedWriter(fw);
-                                    WriteListItems(bw);
-                                    bw.close();
-                                } else {
-                                    Toast.makeText(getBaseContext(), "Cannot write file", Toast.LENGTH_SHORT).show();
-                                    ok = false;
-                                }
-                            }
-                            else {
-                                Toast.makeText(getBaseContext(), "Cannot create file", Toast.LENGTH_SHORT).show();
+
+                            if (file.canWrite() || file.setWritable(true)) {
+                                FileWriter fw = new FileWriter(file);
+                                BufferedWriter bw = new BufferedWriter(fw);
+                                WriteListItems(bw);
+                                bw.close();
+                            } else {
+                                Toast.makeText(getBaseContext(), "Cannot write file", Toast.LENGTH_SHORT).show();
                                 ok = false;
                             }
-
+                        }
+                        else {
+                            Toast.makeText(getBaseContext(), "Cannot create file", Toast.LENGTH_SHORT).show();
+                            ok = false;
                         }
                     }
 
@@ -210,6 +216,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         SaveListItem(dataString, timeString, latitudeString, longitudeString);
 
         listViewItems.add(0, newEntry);
+        labels.add(0, dataString);
         listViewAdapter.notifyDataSetChanged();
     }
 
@@ -226,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             editor.putString(s, timeString);
             s = Constants.ARRAY_ITEM_PREFIX + "_" + Constants.LAT_KEY + "_" + sizeString;
             editor.putString(s, latitudeString);
-            s = Constants.ARRAY_ITEM_PREFIX + "_" + Constants.LAT_KEY + "_" + sizeString;
+            s = Constants.ARRAY_ITEM_PREFIX + "_" + Constants.LONG_KEY + "_" + sizeString;
             editor.putString(s, longitudeString);
         } catch (Exception e) {
             e.printStackTrace();
@@ -239,22 +246,26 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         SharedPreferences prefs = getDefaultSharedPreferences(this);
         try {
             listViewItems.clear();
+            labels.clear();
             String s = Constants.ARRAY_ITEM_PREFIX + "_LAST_INDEX";
-            int ilast = prefs.getInt(s, listViewItems.size());
+            int ilast = prefs.getInt(s, -1);
             for(int i = 0; i <= ilast; i++)
             {
                 HashMap<String,String> newEntry =new HashMap<>();
                 String sizeString = String.valueOf(i);
                 s = Constants.ARRAY_ITEM_PREFIX + "_" + Constants.DATA_KEY + "_" + sizeString;
+                String ss = prefs.getString(s,null);
                 newEntry.put(Constants.DATA_KEY, prefs.getString(s,null));
                 s = Constants.ARRAY_ITEM_PREFIX + "_" + Constants.TIME_KEY + "_" + sizeString;
                 newEntry.put(Constants.TIME_KEY, prefs.getString(s,null));
                 s = Constants.ARRAY_ITEM_PREFIX + "_" + Constants.LAT_KEY + "_" + sizeString;
                 newEntry.put(Constants.LAT_KEY, prefs.getString(s,null));
-                s = Constants.ARRAY_ITEM_PREFIX + "_" + Constants.LAT_KEY + "_" + sizeString;
+                s = Constants.ARRAY_ITEM_PREFIX + "_" + Constants.LONG_KEY + "_" + sizeString;
                 newEntry.put(Constants.LONG_KEY, prefs.getString(s,null));
-                if(prefs.getString(s,null).length()>0)
+                if(prefs.getString(s,null).length()>0) {
                     listViewItems.add(0, newEntry);
+                    labels.add(0,ss);
+                }
             }
             listViewAdapter.notifyDataSetChanged();
 
@@ -297,10 +308,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         SharedPreferences.Editor editor = prefs.edit();
         try {
             listViewItems.clear();
+            labels.clear();
             String s = Constants.ARRAY_ITEM_PREFIX + "_LAST_INDEX";
             int ilast = prefs.getInt(s, listViewItems.size());
             editor.putInt(s, 0);
-            for(int i = 0; i < ilast; i++)
+            for(int i = 0; i <= ilast; i++)
             {
                 String sizeString = String.valueOf(i);
                 s = Constants.ARRAY_ITEM_PREFIX + "_" + Constants.DATA_KEY + "_" + sizeString;
@@ -309,7 +321,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 editor.remove(s);
                 s = Constants.ARRAY_ITEM_PREFIX + "_" + Constants.LAT_KEY + "_" + sizeString;
                 editor.remove(s);
-                s = Constants.ARRAY_ITEM_PREFIX + "_" + Constants.LAT_KEY + "_" + sizeString;
+                s = Constants.ARRAY_ITEM_PREFIX + "_" + Constants.LONG_KEY + "_" + sizeString;
                 editor.remove(s);
             }
             listViewAdapter.notifyDataSetChanged();
