@@ -9,6 +9,7 @@ public class Constants {
     public static final String DATA_KEY="DATA";
     public static final String LAT_KEY="LATITUDE";
     public static final String LONG_KEY="LOGITUDE";
+    public static final String UTM_KEY="UTM";
     public static final String TIME_KEY="TIMESTAMP";
     public static final String ARRAY_ITEM_PREFIX = "prim8logger";
     public static final String OUTPUT_FILE_NAME = "prim8logger";

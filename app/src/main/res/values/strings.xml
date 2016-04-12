@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Prim8 Data Logger</string>
-    <string name="transfer_to_file">Transfer to File</string>
+    <string name="entry_hint">Enter your next data string here</string>
+    <string name="transfer_to_file">Export and Clear</string>
 </resources>

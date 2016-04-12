@@ -4,7 +4,6 @@ package com.prim8software.app.prim8datalogger;
 // Copyright 2016, Scott Johnson, Prim8 Software (scott.johnson@prim8software.com)
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -38,12 +37,14 @@ import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
 
-    ArrayList<String> labels = new ArrayList<String>();
-    ArrayList<HashMap<String,String>> listViewItems=new ArrayList<HashMap<String,String>>();
+    ArrayList<String> labels = new ArrayList<>();
+    ArrayList<HashMap<String,String>> listViewItems=new ArrayList<>();
     //LogListViewAdapter listViewAdapter;
     ArrayAdapter<String> listViewAdapter;
     LocationManager locationManager;
-    String latitudeString, longitudeString, locationProvider;
+    String latitudeString, longitudeString;
+    String utmString;
+    String locationProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -54,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         //--LISTVIEW--
         ListView lv = (ListView) this.findViewById(R.id.listView);
         //listViewAdapter=new LogListViewAdapter(this, listViewItems);
-        listViewAdapter = new ArrayAdapter<String>(  this,
+        listViewAdapter = new ArrayAdapter<>(  this,
                 android.R.layout.simple_list_item_1,
                 labels
         );
@@ -67,10 +68,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                     int position, long id)
             {
                 HashMap<String,String> entry = listViewItems.get(position);
-                String ss = "Name:\n" + (String)entry.get(Constants.DATA_KEY) +
-                        "\nTime:\n" + (String)entry.get(Constants.TIME_KEY) +
-                        "\nLatitude:\n" + (String)entry.get(Constants.LAT_KEY) +
-                        "\nLongitude\n" + (String)entry.get(Constants.LONG_KEY) +
+                String ss = "Name:\n" + entry.get(Constants.DATA_KEY) +
+                        "\nTime:\n" + entry.get(Constants.TIME_KEY) +
+                        "\nLatitude:\n" + entry.get(Constants.LAT_KEY) +
+                        "\nLongitude\n" + entry.get(Constants.LONG_KEY) +
+                        "\nUTM\n" + entry.get(Constants.UTM_KEY) +
                         "\n";
                 Log.d("MainActivity",ss);
                 Toast.makeText(getBaseContext(), ss, Toast.LENGTH_LONG).show();
@@ -128,14 +130,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             public void onClick(View v) {
                 try
                 {
-                    boolean ok = isExternalStorageWritable();
-                    if(ok)
+                    if(isExternalStorageWritable())
                     {
                         File file = new File(Environment.getExternalStoragePublicDirectory(
                                 Environment.DIRECTORY_DOCUMENTS), Constants.OUTPUT_FILE_NAME + String.valueOf(Common.CurrentTime()) + ".csv");
                         if(file.createNewFile())
                         {
-
                             if (file.canWrite() || file.setWritable(true)) {
                                 FileWriter fw = new FileWriter(file);
                                 BufferedWriter bw = new BufferedWriter(fw);
@@ -143,12 +143,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                 bw.close();
                             } else {
                                 Toast.makeText(getBaseContext(), "Cannot write file", Toast.LENGTH_SHORT).show();
-                                ok = false;
                             }
                         }
                         else {
                             Toast.makeText(getBaseContext(), "Cannot create file", Toast.LENGTH_SHORT).show();
-                            ok = false;
                         }
                     }
 
@@ -165,6 +163,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void onLocationChanged(Location location) {
         longitudeString = String.valueOf(location.getLongitude());
         latitudeString = String.valueOf(location.getLatitude());
+
+        CoordinateConversion c = new CoordinateConversion();
+        utmString = c.latLon2UTM(location.getLatitude(), location.getLongitude());
     }
 
     @Override
@@ -185,20 +186,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     /* Checks if external storage is available for read and write */
     public boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
+        return Environment.MEDIA_MOUNTED.equals(state);
     }
 
     /* Checks if external storage is available to at least read */
     public boolean isExternalStorageReadable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            return true;
-        }
-        return false;
+        return Environment.MEDIA_MOUNTED.equals(state) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state);
     }
 
     public void UpdateListView(String dataString, Integer time)
@@ -211,16 +205,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         newEntry.put(Constants.TIME_KEY, timeString);
         newEntry.put(Constants.LAT_KEY, latitudeString);
         newEntry.put(Constants.LONG_KEY, longitudeString);
+        newEntry.put(Constants.UTM_KEY, utmString);
 
         //--CACHE IN SHARED PREFERENCES--
-        SaveListItem(dataString, timeString, latitudeString, longitudeString);
+        SaveListItem(dataString, timeString, latitudeString, longitudeString, utmString);
 
         listViewItems.add(0, newEntry);
         labels.add(0, dataString);
         listViewAdapter.notifyDataSetChanged();
     }
 
-    private boolean SaveListItem(String dataString, String timeString, String latitudeString, String longitudeString) {
+    private boolean SaveListItem(String dataString, String timeString, String latitudeString, String longitudeString, String utmString) {
         SharedPreferences prefs = getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = prefs.edit();
         String sizeString = String.valueOf(listViewItems.size());
@@ -235,6 +230,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             editor.putString(s, latitudeString);
             s = Constants.ARRAY_ITEM_PREFIX + "_" + Constants.LONG_KEY + "_" + sizeString;
             editor.putString(s, longitudeString);
+            s = Constants.ARRAY_ITEM_PREFIX + "_" + Constants.UTM_KEY + "_" + sizeString;
+            editor.putString(s, utmString);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -262,7 +259,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 newEntry.put(Constants.LAT_KEY, prefs.getString(s,null));
                 s = Constants.ARRAY_ITEM_PREFIX + "_" + Constants.LONG_KEY + "_" + sizeString;
                 newEntry.put(Constants.LONG_KEY, prefs.getString(s,null));
-                if(prefs.getString(s,null).length()>0) {
+                s = Constants.ARRAY_ITEM_PREFIX + "_" + Constants.UTM_KEY + "_" + sizeString;
+                newEntry.put(Constants.UTM_KEY, prefs.getString(s,null));
+                if(!(prefs.getString(s,null) == null)) {
                     listViewItems.add(0, newEntry);
                     labels.add(0,ss);
                 }
@@ -281,14 +280,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         try {
             while (iter.hasNext()) {
                 HashMap<String, String> item = iter.next();
-                String dataString = (String) item.get(Constants.DATA_KEY);
+                String dataString = item.get(Constants.DATA_KEY);
                 if (dataString.contains(",")) {
                     dataString = "\"" + dataString + "\"";
                 }
-                String timeString = (String) item.get(Constants.TIME_KEY);
-                String latitudeString = (String) item.get(Constants.LAT_KEY);
-                String longitudeString = (String) item.get(Constants.LONG_KEY);
-                String s = dataString + "," + timeString + "," + latitudeString + "," + longitudeString + "\n";
+                String timeString = item.get(Constants.TIME_KEY);
+                String latitudeString = item.get(Constants.LAT_KEY);
+                String longitudeString = item.get(Constants.LONG_KEY);
+                String utmString = item.get(Constants.UTM_KEY);
+                String s = dataString + "," + timeString + "," + latitudeString + "," + longitudeString + "," + utmString + "\n";
                 bw.write(s);
             }
         }
@@ -322,6 +322,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 s = Constants.ARRAY_ITEM_PREFIX + "_" + Constants.LAT_KEY + "_" + sizeString;
                 editor.remove(s);
                 s = Constants.ARRAY_ITEM_PREFIX + "_" + Constants.LONG_KEY + "_" + sizeString;
+                editor.remove(s);
+                s = Constants.ARRAY_ITEM_PREFIX + "_" + Constants.UTM_KEY + "_" + sizeString;
                 editor.remove(s);
             }
             listViewAdapter.notifyDataSetChanged();
