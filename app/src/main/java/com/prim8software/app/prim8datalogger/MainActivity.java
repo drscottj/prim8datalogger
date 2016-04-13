@@ -157,6 +157,24 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 }
             }
         });
+
+        //--ABOUT--
+        Button buttonAbout = (Button) findViewById(R.id.buttonAbout);
+        buttonAbout.setTextSize(TypedValue.COMPLEX_UNIT_DIP, Constants.text_dip_size);
+        buttonAbout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try
+                {
+                    Toast.makeText(getBaseContext(), getString(R.string.about), Toast.LENGTH_LONG).show();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+
     }
 
     @Override
