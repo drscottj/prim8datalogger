@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
 
         //--TEXT LISTENER--
-        EditText etUserInput = (EditText) findViewById(R.id.editText);
+        EditText etUserInput = (EditText) this.findViewById(R.id.editText);
         {
             etUserInput.addTextChangedListener(new UserEntryWatcher(this));
             //, findViewById(R.id.listView)));
@@ -120,10 +120,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         //--INITIALIZE LIST--
         LoadListItems();
 
-
-
         //--SAVE FILES--
-        Button button = (Button) findViewById(R.id.button);
+        Button button = (Button) this.findViewById(R.id.button);
         button.setTextSize(TypedValue.COMPLEX_UNIT_DIP, Constants.text_dip_size);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -159,9 +157,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         });
 
         //--ABOUT--
-        Button buttonAbout = (Button) findViewById(R.id.buttonAbout);
-        buttonAbout.setTextSize(TypedValue.COMPLEX_UNIT_DIP, Constants.text_dip_size);
-        buttonAbout.setOnClickListener(new View.OnClickListener() {
+        Button about = (Button) this.findViewById(R.id.about);
+        about.setTextSize(TypedValue.COMPLEX_UNIT_DIP, Constants.text_dip_size);
+        about.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try
