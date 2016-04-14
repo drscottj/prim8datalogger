@@ -291,11 +291,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     private boolean WriteListItems(BufferedWriter bw)
     {
-        Iterator<HashMap<String,String>> iter = listViewItems.iterator();
         boolean ok = true;
         try {
-            while (iter.hasNext()) {
-                HashMap<String, String> item = iter.next();
+            for(int j = listViewItems.size() - 1; j >= 0; j--){
+                HashMap<String, String> item = listViewItems.get(j);
                 String dataString = item.get(Constants.DATA_KEY);
                 if (dataString.contains(",")) {
                     dataString = "\"" + dataString + "\"";
