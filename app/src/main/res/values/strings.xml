@@ -3,5 +3,5 @@
     <string name="entry_hint">Enter your next data string here</string>
     <string name="transfer_to_file">Export and Clear</string>
     <string name="about_label">About</string>
-    <string name="about">Prim8 Data Logger v 1.0.160412, (c) 2016 Scott Johnson (scott.johnson@prim8software.com)</string>
+    <string name="about">Prim8 Data Logger v 1.0.160413, (c) 2016 Scott Johnson (scott.johnson@prim8software.com)</string>
 </resources>

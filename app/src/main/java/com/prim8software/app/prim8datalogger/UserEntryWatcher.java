@@ -73,9 +73,7 @@ public class UserEntryWatcher implements TextWatcher {
         Log.i("UserEntryTextWatcher","Reading behavior line: " + ss);
 
         ss = ss.replace("\n", "");
-        if(ss.length() > 0) {
-            ((MainActivity) this.activity).UpdateListView(ss, timestampFirstLetterTyped);
-        }
+        ((MainActivity) this.activity).UpdateListView(ss, timestampFirstLetterTyped);
         s.clear();
         this.timestampFirstLetterTyped = -1;
     }
