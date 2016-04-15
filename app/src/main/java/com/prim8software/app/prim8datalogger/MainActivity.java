@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
@@ -109,10 +110,26 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             }
             Location location = locationManager.getLastKnownLocation(locationProvider);
             locationManager.requestLocationUpdates(locationProvider, 15000, 1, this);
-            if (location != null)
+            if (location != null) {
                 onLocationChanged(location);
-            else
-                Toast.makeText(getBaseContext(), "No Location Provider Found", Toast.LENGTH_SHORT).show();
+            } else {
+                List<String> providers = locationManager.getProviders(true);
+                Location bestLocation = null;
+                for (String provider : providers) {
+                    location = locationManager.getLastKnownLocation(provider);
+                    if (location == null) {
+                        continue;
+                    }
+                    if (bestLocation == null || location.getAccuracy() < bestLocation.getAccuracy()) {
+                        // Found best last known location: %s", l);
+                        bestLocation = location;
+                    }
+                }
+                if(bestLocation != null)
+                    onLocationChanged(bestLocation);
+                else
+                    Toast.makeText(getBaseContext(), "No Location Provider Found", Toast.LENGTH_SHORT).show();
+            }
         }
 
 
