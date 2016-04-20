@@ -33,13 +33,13 @@ public class Common {
     private static String LongDurationToString(long milliseconds)
     {
         java.util.Date date = new java.util.Date(milliseconds);
-        SimpleDateFormat format = new SimpleDateFormat("kk:mm:ss");
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
         return format.format(date);
     }
 
     private static long StringToLongDuration(String duration)
     {
-        SimpleDateFormat format = new SimpleDateFormat("kk:mm:ss");
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
         try {
             return format.parse(duration).getTime();
         } catch (ParseException e) {
@@ -51,7 +51,7 @@ public class Common {
     private static String LongTimeToString(long milliseconds)
     {
         java.util.Date date = new java.util.Date(milliseconds);
-        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yy kk:mm:ss");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return format.format(date);
     }
 
@@ -64,7 +64,7 @@ public class Common {
 
     private static long StringToLongTime(String dateString)
     {
-        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yy kk:mm:ss");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date(0);
         try {
             date = format.parse(dateString);
@@ -93,7 +93,7 @@ public class Common {
     private static long StringArrayToLongTime(String[] stringArray)
     {
         if(stringArray.length != 4)
-            throw new IllegalArgumentException("StringArray length for time must be length 4 (year, month, day, kk:mm:ss)!");
+            throw new IllegalArgumentException("StringArray length for time must be length 4 (year, month, day, HH:mm:ss)!");
 
         Calendar c = Calendar.getInstance();
         c.set(Calendar.YEAR, Integer.parseInt(stringArray[0]));
@@ -106,7 +106,7 @@ public class Common {
         String regex = "\\:";
         String[] timeArray = stringArray[3].split(regex);
         if(stringArray.length < 1)
-            throw new IllegalArgumentException("StringArray length for kk:mm:ss must be at least length 1!");
+            throw new IllegalArgumentException("StringArray length for HH:mm:ss must be at least length 1!");
 
         c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(timeArray[0]));
         if(timeArray.length >= 1)

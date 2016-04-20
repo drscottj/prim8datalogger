@@ -320,7 +320,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 String latitudeString = item.get(Constants.LAT_KEY);
                 String longitudeString = item.get(Constants.LONG_KEY);
                 String utmString = item.get(Constants.UTM_KEY);
-                String s = dataString + "," + timeString + "," + latitudeString + "," + longitudeString + "," + utmString + "\n";
+                //String s = dataString + "," + timeString + "," + latitudeString + "," + longitudeString + "," + utmString + "\n";
+                String s = timeString + "," + utmString + "," + dataString + "\n";
                 bw.write(s);
             }
         }
