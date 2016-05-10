@@ -26,15 +26,15 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
+        android:layout_gravity="center"
         android:text="@string/about_label"
         android:id="@+id/about"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:text="@string/transfer_to_file"
+        android:layout_gravity="center"
+        android:text="@string/clear_entries"
         android:id="@+id/button"/>
 
 </LinearLayout>

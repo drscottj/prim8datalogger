@@ -12,6 +12,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Environment;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -147,22 +148,23 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 {
                     if(isExternalStorageWritable())
                     {
-                        File file = new File(Environment.getExternalStoragePublicDirectory(
-                                Environment.DIRECTORY_DOCUMENTS), Constants.OUTPUT_FILE_NAME + String.valueOf(Common.CurrentTime()) + ".csv");
-                        if(file.createNewFile())
-                        {
-                            if (file.canWrite() || file.setWritable(true)) {
-                                FileWriter fw = new FileWriter(file);
-                                BufferedWriter bw = new BufferedWriter(fw);
-                                WriteListItems(bw);
-                                bw.close();
-                            } else {
-                                Toast.makeText(getBaseContext(), "Cannot write file", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                        else {
-                            Toast.makeText(getBaseContext(), "Cannot create file", Toast.LENGTH_SHORT).show();
-                        }
+                        ClearListItems();
+//                        File file = new File(Environment.getExternalStoragePublicDirectory(
+//                                Environment.DIRECTORY_DOCUMENTS), Constants.OUTPUT_FILE_NAME + String.valueOf(Common.CurrentTime()) + ".csv");
+//                        if(file.createNewFile())
+//                        {
+//                            if (file.canWrite() || file.setWritable(true)) {
+//                                FileWriter fw = new FileWriter(file);
+//                                BufferedWriter bw = new BufferedWriter(fw);
+//                                WriteListItems(bw);
+//                                bw.close();
+//                            } else {
+//                                Toast.makeText(getBaseContext(), "Cannot write file", Toast.LENGTH_SHORT).show();
+//                            }
+//                        }
+//                        else {
+//                            Toast.makeText(getBaseContext(), "Cannot create file", Toast.LENGTH_SHORT).show();
+//                        }
                     }
 
                 }
@@ -248,6 +250,39 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         listViewAdapter.notifyDataSetChanged();
     }
 
+    private void AppendToFile(String str)
+    {
+        try
+        {
+            if(isExternalStorageWritable())
+            {
+                final String android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+                File file = new File(Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_DOCUMENTS), android_id + "_" + Common.CurrentToDateString() + ".csv");
+                if(file.createNewFile() || file.exists())
+                {
+                    if (file.canWrite() || file.setWritable(true)) {
+                        FileWriter fw = new FileWriter(file, true);
+                        BufferedWriter bw = new BufferedWriter(fw);
+                        bw.write(str);
+                        bw.close();
+                    } else {
+                        Toast.makeText(getBaseContext(), "Cannot write file", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                else
+                {
+                    Toast.makeText(getBaseContext(), "Cannot create file", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     private boolean SaveListItem(String dataString, String timeString, String latitudeString, String longitudeString, String utmString) {
         SharedPreferences prefs = getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = prefs.edit();
@@ -265,6 +300,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             editor.putString(s, longitudeString);
             s = Constants.ARRAY_ITEM_PREFIX + "_" + Constants.UTM_KEY + "_" + sizeString;
             editor.putString(s, utmString);
+
+            s = timeString + "," + utmString + "," + dataString + "\n";
+
+            AppendToFile(s);
         } catch (Exception e) {
             e.printStackTrace();
         }

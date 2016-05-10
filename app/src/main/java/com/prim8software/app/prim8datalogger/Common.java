@@ -32,7 +32,7 @@ public class Common {
 
     private static String LongDurationToString(long milliseconds)
     {
-        java.util.Date date = new java.util.Date(milliseconds);
+        final java.util.Date date = new java.util.Date(milliseconds);
         SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
         return format.format(date);
     }
@@ -52,6 +52,14 @@ public class Common {
     {
         java.util.Date date = new java.util.Date(milliseconds);
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return format.format(date);
+    }
+
+    public static String CurrentToDateString()
+    {
+        long milliseconds = System.currentTimeMillis();
+        java.util.Date date = new java.util.Date(milliseconds);
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         return format.format(date);
     }
 
