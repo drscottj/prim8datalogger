@@ -100,13 +100,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         locationProvider = locationManager.getBestProvider(criteria, false);
-        if (locationProvider != null && !locationProvider.equals(""))
-        {
+        if (locationProvider != null && !locationProvider.equals("")) {
             if (ActivityCompat.checkSelfPermission(this,
                     Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                     ActivityCompat.checkSelfPermission(this,
-                            Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-            {
+                            Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 return;
             }
             Location location = locationManager.getLastKnownLocation(locationProvider);
@@ -126,29 +124,27 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         bestLocation = location;
                     }
                 }
-                if(bestLocation != null)
+                if (bestLocation != null)
                     onLocationChanged(bestLocation);
                 else
                     Toast.makeText(getBaseContext(), "No Location Provider Found", Toast.LENGTH_SHORT).show();
             }
         }
 
-
-
         //--INITIALIZE LIST--
         LoadListItems();
 
-        //--SAVE FILES--
-        Button button = (Button) this.findViewById(R.id.button);
-        button.setTextSize(TypedValue.COMPLEX_UNIT_DIP, Constants.text_dip_size);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try
-                {
-                    if(isExternalStorageWritable())
-                    {
-                        ClearListItems();
+        //--CLEAR LIST--
+//        Button button = (Button) this.findViewById(R.id.button);
+//        button.setTextSize(TypedValue.COMPLEX_UNIT_DIP, Constants.text_dip_size);
+//        button.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                try
+//                {
+//                    if(isExternalStorageWritable())
+//                    {
+//                        ClearListItems();
 //                        File file = new File(Environment.getExternalStoragePublicDirectory(
 //                                Environment.DIRECTORY_DOCUMENTS), Constants.OUTPUT_FILE_NAME + String.valueOf(Common.CurrentTime()) + ".csv");
 //                        if(file.createNewFile())
@@ -165,15 +161,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 //                        else {
 //                            Toast.makeText(getBaseContext(), "Cannot create file", Toast.LENGTH_SHORT).show();
 //                        }
-                    }
-
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        });
+//                    }
+//
+//                }
+//                catch (Exception e)
+//                {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
 
         //--ABOUT--
         Button about = (Button) this.findViewById(R.id.about);
