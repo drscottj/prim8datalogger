@@ -14,6 +14,7 @@ import android.location.LocationManager;
 import android.os.Environment;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -97,7 +98,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
 
         //--LOCATION--
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED))
+            ActivityCompat.requestPermissions(this,new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         locationProvider = locationManager.getBestProvider(criteria, false);
         if (locationProvider != null && !locationProvider.equals("")) {
