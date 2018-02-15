@@ -224,6 +224,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         return Environment.MEDIA_MOUNTED.equals(state);
     }
 
+    public void RequestExternalStorageReadWrite() {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+            ActivityCompat.requestPermissions(this, new String[]{
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    1);
+    }
+
     /* Checks if external storage is available to at least read */
     public boolean isExternalStorageReadable() {
         String state = Environment.getExternalStorageState();
@@ -254,11 +262,28 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     {
         try
         {
+            RequestExternalStorageReadWrite();
             if(isExternalStorageWritable())
             {
+                File path = Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_DOCUMENTS);
+                if(!path.exists()) {
+                    path.mkdirs();
+                }
+                if(!path.exists()) {
+                    path = Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_DOWNLOADS);
+                    //path = Environment.getExternalStoragePublicDirectory("Prim8");
+                    path.mkdirs();
+                    if(!path.exists()) {
+                        Toast.makeText(getBaseContext(), "Cannot create file", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+
                 final String android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-                File file = new File(Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_DOCUMENTS), android_id + "_" + Common.CurrentToDateString() + ".csv");
+                final String file_name = android_id + "_" + Common.CurrentToDateString() + ".csv";
+                File file = new File(path, file_name);
                 if(file.createNewFile() || file.exists())
                 {
                     if (file.canWrite() || file.setWritable(true)) {
