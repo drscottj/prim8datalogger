@@ -4,5 +4,5 @@
     <string name="clear_entries">Clear</string>
     <string name="export_entries">Export</string>
     <string name="about_label">About</string>
-    <string name="about">Prim8 Data Logger v 1.0.170503, (c) 2017 Scott Johnson (scott.johnson@prim8software.com)</string>
+    <string name="about">Prim8 Data Logger v 1.0.190125, (c) 2017,2018,2019 Scott Johnson (scott.johnson@prim8software.com)</string>
 </resources>
