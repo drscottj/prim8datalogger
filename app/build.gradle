@@ -7,15 +7,11 @@ android {
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.prim8software.prim8mobile"
+        applicationId "com.prim8software.prim8datalogger"
         minSdk 26
         targetSdk 34
         versionCode 1
         versionName "1.0"
-        buildConfigField "String", "DROPBOX_ACCESS_TOKEN", "\"${DROPBOX_ACCESS_TOKEN}\""
-        buildConfigField "String", "DROPBOX_REFRESH_TOKEN", "\"${DROPBOX_REFRESH_TOKEN}\""
-        buildConfigField "String", "DROPBOX_APP_KEY", "\"${DROPBOX_APP_KEY}\""
-        buildConfigField "String", "DROPBOX_APP_SECRET", "\"${DROPBOX_APP_SECRET}\""
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
